@@ -7,8 +7,10 @@ A Go-based REST API for vocabulary learning with local caching and spaced repeti
 - 📚 **Word Lookup:** Fetch definitions, synonyms, examples, and pronunciation
 - 💾 **Local-First:** SQLite cache for fast, offline-capable lookups
 - 🔄 **Auto-Sync:** Automatically caches external API responses
-- 🧠 **Spaced Repetition:** (Phase 2) SM-2 algorithm for effective learning
-- 👤 **Simple Auth:** (Phase 2) Username-based accounts, no passwords
+- 🧠 **Spaced Repetition:** ✅ SM-2 algorithm for effective learning
+- 👤 **Simple Auth:** ✅ Username-based accounts, no passwords
+- 📊 **Progress Tracking:** ✅ Learning statistics, review history, and streaks
+- 🎯 **Smart Scheduling:** ✅ Adaptive review intervals based on performance
 
 ## Quick Start
 
@@ -39,14 +41,23 @@ curl http://localhost:8080/api/words/mordant | jq
 
 ## API Endpoints
 
-### Phase 1 (Current)
+### Phase 1 - Word Lookup ✅
 - `GET /api/words/:word` - Look up word definition
 
-### Phase 2 (Planned)
+### Phase 2 - Spaced Repetition ✅
+**User Management:**
 - `POST /api/users` - Create user account
-- `GET /api/users/:username/review` - Get words due for review
-- `POST /api/users/:username/review/:word` - Submit review rating
+- `GET /api/users/:username` - Get user details
+- `GET /api/users/:username/stats` - Get learning statistics
+
+**Vocabulary:**
 - `POST /api/users/:username/words/:word` - Add word to study list
+- `GET /api/users/:username/words` - Get all user's words (optional: `?status=learning|reviewing|mastered`)
+
+**Reviews:**
+- `GET /api/users/:username/review` - Get words due for review
+- `POST /api/users/:username/review/:word` - Submit review rating (body: `{"quality": 0-5}`)
+- `GET /api/users/:username/review/:word/history` - Get review history for a word
 
 ## Architecture
 
@@ -66,12 +77,19 @@ User Request → API Handler → Service Layer → Local DB (SQLite)
 ## Database
 
 SQLite with normalized schema:
+
+**Phase 1 - Dictionary Data:**
 - `words` - Base word entries
 - `meanings` - Parts of speech
 - `definitions` - Multiple definitions per meaning
 - `phonetics` - Pronunciation guides
 - `synonyms` / `antonyms` - Related words
 - `source_urls` - Attribution
+
+**Phase 2 - Learning System:**
+- `users` - User accounts
+- `user_words` - Words being studied (with SM-2 metadata)
+- `review_history` - Complete audit trail of all reviews
 
 ## Development Status
 
@@ -84,11 +102,14 @@ SQLite with normalized schema:
 - [x] Test integration
 - [x] Dataset import script
 
-⏳ **Phase 2 - Spaced Repetition** (Planned)
-- [ ] User accounts
-- [ ] SM-2 algorithm
-- [ ] Review scheduling
-- [ ] Progress tracking
+✅ **Phase 2 - Spaced Repetition** (Complete)
+- [x] User accounts (username-based)
+- [x] SM-2 algorithm implementation
+- [x] Review scheduling with quality ratings
+- [x] Progress tracking and statistics
+- [x] Word status management (learning/reviewing/mastered)
+- [x] Review history tracking
+- [x] Comprehensive API endpoints
 
 ## Project Structure
 
