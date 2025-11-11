@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:api.dictionaryapi.dev)",
+      "Bash(curl:*)",
+      "Bash(go mod init:*)",
+      "Bash(go get:*)",
+      "Bash(go build:*)",
+      "Bash(./api)",
+      "Bash(lsof:*)",
+      "Bash(netstat:*)",
+      "Bash(ss:*)",
+      "Bash(sqlite3:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(jq:*)",
+      "Bash(unzip:*)",
+      "Bash(./import test_data/)",
+      "Bash(./import datasets/wordset-dictionary-master/data/)",
+      "Bash(wait)",
+      "Bash(PORT=8081 ./api:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,0 +1,35 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+cmd/api/api
+
+# Test binary
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Go workspace file
+go.work
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
