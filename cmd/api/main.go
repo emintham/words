@@ -22,11 +22,29 @@ func main() {
 
 	// Initialize handlers
 	wordHandler := handlers.NewWordHandler(db)
+	userHandler := handlers.NewUserHandler(db)
+	vocabularyHandler := handlers.NewVocabularyHandler(db)
+	reviewHandler := handlers.NewReviewHandler(db)
 
 	// API routes
 	api := router.Group("/api")
 	{
+		// Phase 1: Word lookup
 		api.GET("/words/:word", wordHandler.GetWord)
+
+		// Phase 2: User management
+		api.POST("/users", userHandler.CreateUser)
+		api.GET("/users/:username", userHandler.GetUser)
+		api.GET("/users/:username/stats", userHandler.GetUserStats)
+
+		// Phase 2: Vocabulary tracking
+		api.POST("/users/:username/words/:word", vocabularyHandler.AddWord)
+		api.GET("/users/:username/words", vocabularyHandler.GetUserWords)
+
+		// Phase 2: Spaced repetition reviews
+		api.GET("/users/:username/review", reviewHandler.GetDueWords)
+		api.POST("/users/:username/review/:word", reviewHandler.SubmitReview)
+		api.GET("/users/:username/review/:word/history", reviewHandler.GetReviewHistory)
 	}
 
 	// Get port from environment or default to 8080
