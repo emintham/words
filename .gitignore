@@ -5,6 +5,14 @@
 *.so
 *.dylib
 cmd/api/api
+api
+seed
+import
+
+# Debug utilities
+cmd/debug/
+cmd/check_date/
+cmd/update_review/
 
 # Test binary
 *.test
