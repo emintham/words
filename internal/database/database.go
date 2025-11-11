@@ -88,6 +88,47 @@ func createTables(db *sql.DB) error {
 		url TEXT NOT NULL,
 		FOREIGN KEY (word_id) REFERENCES words(id) ON DELETE CASCADE
 	);
+
+	-- Phase 2: User Management and Spaced Repetition
+
+	CREATE TABLE IF NOT EXISTS users (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		username TEXT NOT NULL UNIQUE,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+
+	CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+
+	CREATE TABLE IF NOT EXISTS user_words (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		user_id INTEGER NOT NULL,
+		word_id INTEGER NOT NULL,
+		added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		status TEXT NOT NULL DEFAULT 'learning',
+		next_review_date DATETIME NOT NULL,
+		ease_factor REAL NOT NULL DEFAULT 2.5,
+		interval_days INTEGER NOT NULL DEFAULT 1,
+		FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+		FOREIGN KEY (word_id) REFERENCES words(id) ON DELETE CASCADE,
+		UNIQUE(user_id, word_id)
+	);
+
+	CREATE INDEX IF NOT EXISTS idx_user_words_user_id ON user_words(user_id);
+	CREATE INDEX IF NOT EXISTS idx_user_words_next_review ON user_words(user_id, next_review_date);
+
+	CREATE TABLE IF NOT EXISTS review_history (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		user_id INTEGER NOT NULL,
+		word_id INTEGER NOT NULL,
+		reviewed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		quality INTEGER NOT NULL CHECK(quality >= 0 AND quality <= 5),
+		interval_days INTEGER NOT NULL,
+		ease_factor REAL NOT NULL,
+		FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+		FOREIGN KEY (word_id) REFERENCES words(id) ON DELETE CASCADE
+	);
+
+	CREATE INDEX IF NOT EXISTS idx_review_history_user_word ON review_history(user_id, word_id);
 	`
 
 	_, err := db.Exec(schema)
