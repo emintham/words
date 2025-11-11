@@ -75,14 +75,14 @@ SQLite with normalized schema:
 
 ## Development Status
 
-✅ **Phase 1 - Lookup API** (In Progress)
+✅ **Phase 1 - Lookup API** (Complete)
 - [x] Project structure
 - [x] Database schema
 - [x] Local-first lookup logic
 - [x] API endpoint
-- [ ] Install dependencies
-- [ ] Test integration
-- [ ] Dataset import script
+- [x] Install dependencies
+- [x] Test integration
+- [x] Dataset import script
 
 ⏳ **Phase 2 - Spaced Repetition** (Planned)
 - [ ] User accounts
