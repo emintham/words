@@ -19,7 +19,7 @@ A Progressive Web App for learning vocabulary with spaced repetition, built with
 # From the project root
 cd /home/user/words
 ./api
-# API runs on http://localhost:8080
+# API runs on http://localhost:9090
 ```
 
 ### 2. Start the Web App
