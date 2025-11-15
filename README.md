@@ -27,16 +27,16 @@ go build -o api cmd/api/main.go
 ### 3. Run
 ```bash
 ./api
-# Server starts on http://localhost:8080
+# Server starts on http://localhost:9090
 ```
 
 ### 4. Test
 ```bash
 # Look up a word (will fetch from API and cache locally)
-curl http://localhost:8080/api/words/mordant | jq
+curl http://localhost:9090/api/words/mordant | jq
 
 # Second lookup will be instant (from cache)
-curl http://localhost:8080/api/words/mordant | jq
+curl http://localhost:9090/api/words/mordant | jq
 ```
 
 ## API Endpoints
