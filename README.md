@@ -14,23 +14,39 @@ A Go-based REST API for vocabulary learning with local caching and spaced repeti
 
 ## Quick Start
 
-### 1. Install Dependencies
+### Using Docker (Recommended)
+
+The easiest way to run the application is with Docker:
+
+```bash
+docker compose up -d
+```
+
+Then access:
+- **Frontend**: http://localhost
+- **API**: http://localhost:9090
+
+For detailed Docker instructions, see [DOCKER.md](DOCKER.md)
+
+### Manual Setup
+
+#### 1. Install Dependencies
 ```bash
 go get github.com/gin-gonic/gin github.com/mattn/go-sqlite3
 ```
 
-### 2. Build
+#### 2. Build
 ```bash
 go build -o api cmd/api/main.go
 ```
 
-### 3. Run
+#### 3. Run
 ```bash
 ./api
 # Server starts on http://localhost:9090
 ```
 
-### 4. Test
+#### 4. Test
 ```bash
 # Look up a word (will fetch from API and cache locally)
 curl http://localhost:9090/api/words/mordant | jq
