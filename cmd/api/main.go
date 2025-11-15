@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 
@@ -10,6 +11,10 @@ import (
 )
 
 func main() {
+	// Parse command-line flags
+	portFlag := flag.String("port", "", "Port to run the server on")
+	flag.Parse()
+
 	// Initialize database
 	db, err := database.InitDB("words.db")
 	if err != nil {
@@ -47,8 +52,11 @@ func main() {
 		api.GET("/users/:username/review/:word/history", reviewHandler.GetReviewHistory)
 	}
 
-	// Get port from environment or default to 8080
-	port := os.Getenv("PORT")
+	// Determine port: command-line flag > environment variable > default
+	port := *portFlag
+	if port == "" {
+		port = os.Getenv("PORT")
+	}
 	if port == "" {
 		port = "8080"
 	}
