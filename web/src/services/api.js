@@ -14,7 +14,15 @@ class ApiService {
 
     try {
       const response = await fetch(url, config);
-      const data = await response.json();
+
+      // Try to parse JSON response
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        // If JSON parsing fails, throw a generic error
+        throw new Error('Failed to communicate with server. Please ensure the backend is running.');
+      }
 
       if (!response.ok) {
         throw new Error(data.error || 'Request failed');

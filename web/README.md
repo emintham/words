@@ -27,8 +27,8 @@ cd /home/user/words
 ```bash
 # From the web directory
 cd web
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 # Web app runs on http://localhost:5173
 ```
 
@@ -73,9 +73,9 @@ web/
 ## Development
 
 ```bash
-npm run dev      # Start dev server
-npm run build    # Build for production
-npm run preview  # Preview production build
+pnpm run dev      # Start dev server
+pnpm run build    # Build for production
+pnpm run preview  # Preview production build
 ```
 
 ## Browser Support
