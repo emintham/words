@@ -31,7 +31,7 @@ function AddWord({ user, onAdded }) {
     setLoading(true);
 
     try {
-      await api.addWordToStudyList(user.username, word.toLowerCase());
+      await api.addWordToStudyList(word.toLowerCase());
       setSuccess(`"${word}" has been added to your study list!`);
       setWord('');
       setWordDetails(null);

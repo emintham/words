@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/words-api/words/internal/auth"
 	"github.com/words-api/words/internal/database"
 	"github.com/words-api/words/internal/handlers"
 )
@@ -37,31 +38,48 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 
+	// Initialize session store
+	sessionStore := auth.NewSessionStore()
+
 	// Initialize handlers
 	wordHandler := handlers.NewWordHandler(db)
 	userHandler := handlers.NewUserHandler(db)
 	vocabularyHandler := handlers.NewVocabularyHandler(db)
 	reviewHandler := handlers.NewReviewHandler(db)
+	authHandler := handlers.NewAuthHandler(db, sessionStore)
 
 	// API routes
 	api := router.Group("/api")
 	{
-		// Phase 1: Word lookup
+		// Public routes
+		// Phase 1: Word lookup (public)
 		api.GET("/words/:word", wordHandler.GetWord)
 
-		// Phase 2: User management
+		// Authentication routes (public)
+		api.POST("/auth/login", authHandler.Login)
+		api.POST("/auth/logout", authHandler.Logout)
+
+		// User registration (public)
 		api.POST("/users", userHandler.CreateUser)
-		api.GET("/users/:username", userHandler.GetUser)
-		api.GET("/users/:username/stats", userHandler.GetUserStats)
 
-		// Phase 2: Vocabulary tracking
-		api.POST("/users/:username/words/:word", vocabularyHandler.AddWord)
-		api.GET("/users/:username/words", vocabularyHandler.GetUserWords)
+		// Protected routes (require authentication)
+		protected := api.Group("")
+		protected.Use(auth.AuthMiddleware(sessionStore))
+		{
+			// User management
+			protected.GET("/user", userHandler.GetUser)
+			protected.GET("/user/stats", userHandler.GetUserStats)
+			protected.GET("/auth/me", authHandler.GetCurrentUser)
 
-		// Phase 2: Spaced repetition reviews
-		api.GET("/users/:username/review", reviewHandler.GetDueWords)
-		api.POST("/users/:username/review/:word", reviewHandler.SubmitReview)
-		api.GET("/users/:username/review/:word/history", reviewHandler.GetReviewHistory)
+			// Vocabulary tracking
+			protected.POST("/words/:word", vocabularyHandler.AddWord)
+			protected.GET("/words", vocabularyHandler.GetUserWords)
+
+			// Spaced repetition reviews
+			protected.GET("/review", reviewHandler.GetDueWords)
+			protected.POST("/review/:word", reviewHandler.SubmitReview)
+			protected.GET("/review/:word/history", reviewHandler.GetReviewHistory)
+		}
 	}
 
 	// Determine port: command-line flag > environment variable > default

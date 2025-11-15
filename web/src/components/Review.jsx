@@ -16,7 +16,7 @@ function Review({ user, onComplete }) {
   const loadDueWords = async () => {
     setLoading(true);
     try {
-      const data = await api.getDueWords(user.username);
+      const data = await api.getDueWords();
       setDueWords(data.words || []);
       if (data.words && data.words.length > 0) {
         loadWordDetails(data.words[0].word);
@@ -40,7 +40,7 @@ function Review({ user, onComplete }) {
   const handleReview = async (quality) => {
     setReviewing(true);
     try {
-      await api.submitReview(user.username, dueWords[currentIndex].word, quality);
+      await api.submitReview(dueWords[currentIndex].word, quality);
 
       // Move to next word
       if (currentIndex + 1 < dueWords.length) {

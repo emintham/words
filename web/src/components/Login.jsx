@@ -12,16 +12,9 @@ function Login({ onLogin }) {
     setLoading(true);
 
     try {
-      // Try to get existing user first
-      let user;
-      try {
-        user = await api.getUser(username);
-      } catch (err) {
-        // User doesn't exist, create new one
-        user = await api.createUser(username);
-      }
-
-      onLogin(user);
+      // Login (creates session and user if doesn't exist)
+      const response = await api.login(username);
+      onLogin(response.user);
     } catch (err) {
       setError(err.message || 'Failed to login. Please try again.');
     } finally {

@@ -16,7 +16,7 @@ function Dashboard({ user, onLogout }) {
 
   const loadStats = async () => {
     try {
-      const data = await api.getUserStats(user.username);
+      const data = await api.getUserStats();
       setStats(data);
     } catch (error) {
       console.error('Failed to load stats:', error);
