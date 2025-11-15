@@ -1,0 +1,42 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+TROUBLESHOOTING.md
+PROGRESS.md
+
+# Development files
+.vscode
+.idea
+.claude
+
+# Build artifacts
+api
+import
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test files
+*_test.go
+test_data
+
+# Database files (use volumes instead)
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+data/
+
+# Datasets
+datasets/
+
+# Frontend
+web/
+
+# Misc
+.DS_Store
+Thumbs.db
