@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import storage from './services/storage';
+import api from './services/api';
 import './App.css';
 
 function App() {
@@ -9,12 +10,22 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in
-    const currentUser = storage.getCurrentUser();
-    if (currentUser) {
-      setUser(currentUser);
-    }
-    setLoading(false);
+    // Validate session with server
+    const checkSession = async () => {
+      try {
+        const response = await api.getCurrentUser();
+        setUser(response.user);
+        storage.setCurrentUser(response.user);
+      } catch (err) {
+        // Session invalid or expired, clear local storage
+        storage.clearCurrentUser();
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkSession();
   }, []);
 
   const handleLogin = (userData) => {
@@ -22,10 +33,16 @@ function App() {
     setUser(userData);
   };
 
-  const handleLogout = () => {
-    storage.clearCurrentUser();
-    storage.clearCache();
-    setUser(null);
+  const handleLogout = async () => {
+    try {
+      await api.logout();
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      storage.clearCurrentUser();
+      storage.clearCache();
+      setUser(null);
+    }
   };
 
   if (loading) {

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/words-api/words/internal/auth"
 	"github.com/words-api/words/internal/services"
 )
 
@@ -52,21 +53,12 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, user)
 }
 
-// GetUser handles GET /api/users/:username
+// GetUser handles GET /api/user (authenticated endpoint)
 func (h *UserHandler) GetUser(c *gin.Context) {
-	username := c.Param("username")
-
-	user, err := h.service.GetUser(username)
-	if err != nil {
-		if err.Error() == "user not found" {
-			c.JSON(http.StatusNotFound, gin.H{
-				"error": "user not found",
-			})
-			return
-		}
-
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to retrieve user",
+	user, exists := auth.GetAuthenticatedUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "not authenticated",
 		})
 		return
 	}
@@ -74,11 +66,17 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-// GetUserStats handles GET /api/users/:username/stats
+// GetUserStats handles GET /api/user/stats (authenticated endpoint)
 func (h *UserHandler) GetUserStats(c *gin.Context) {
-	username := c.Param("username")
+	user, exists := auth.GetAuthenticatedUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "not authenticated",
+		})
+		return
+	}
 
-	stats, err := h.service.GetUserStats(username)
+	stats, err := h.service.GetUserStats(user.Username)
 	if err != nil {
 		if err.Error() == "user not found" {
 			c.JSON(http.StatusNotFound, gin.H{

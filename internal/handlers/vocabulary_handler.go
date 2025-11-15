@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/words-api/words/internal/auth"
 	"github.com/words-api/words/internal/services"
 )
 
@@ -20,12 +21,19 @@ func NewVocabularyHandler(db *sql.DB) *VocabularyHandler {
 	}
 }
 
-// AddWord handles POST /api/users/:username/words/:word
+// AddWord handles POST /api/words/:word (authenticated endpoint)
 func (h *VocabularyHandler) AddWord(c *gin.Context) {
-	username := c.Param("username")
+	user, exists := auth.GetAuthenticatedUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "not authenticated",
+		})
+		return
+	}
+
 	word := c.Param("word")
 
-	userWord, err := h.service.AddWord(username, word)
+	userWord, err := h.service.AddWord(user.Username, word)
 	if err != nil {
 		statusCode := http.StatusInternalServerError
 		if err.Error() == "user not found" {
@@ -43,12 +51,19 @@ func (h *VocabularyHandler) AddWord(c *gin.Context) {
 	c.JSON(http.StatusCreated, userWord)
 }
 
-// GetUserWords handles GET /api/users/:username/words
+// GetUserWords handles GET /api/words (authenticated endpoint)
 func (h *VocabularyHandler) GetUserWords(c *gin.Context) {
-	username := c.Param("username")
+	user, exists := auth.GetAuthenticatedUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "not authenticated",
+		})
+		return
+	}
+
 	status := c.Query("status") // Optional filter: learning, reviewing, mastered
 
-	userWords, err := h.service.GetUserWords(username, status)
+	userWords, err := h.service.GetUserWords(user.Username, status)
 	if err != nil {
 		if err.Error() == "user not found" {
 			c.JSON(http.StatusNotFound, gin.H{

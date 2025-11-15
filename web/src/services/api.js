@@ -5,6 +5,7 @@ class ApiService {
   async request(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
     const config = {
+      credentials: 'include', // Send cookies with requests
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
@@ -35,6 +36,24 @@ class ApiService {
     }
   }
 
+  // Authentication
+  async login(username) {
+    return this.request('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ username }),
+    });
+  }
+
+  async logout() {
+    return this.request('/auth/logout', {
+      method: 'POST',
+    });
+  }
+
+  async getCurrentUser() {
+    return this.request('/auth/me');
+  }
+
   // User Management
   async createUser(username) {
     return this.request('/users', {
@@ -43,12 +62,12 @@ class ApiService {
     });
   }
 
-  async getUser(username) {
-    return this.request(`/users/${username}`);
+  async getUser() {
+    return this.request('/user');
   }
 
-  async getUserStats(username) {
-    return this.request(`/users/${username}/stats`);
+  async getUserStats() {
+    return this.request('/user/stats');
   }
 
   // Word Lookup
@@ -57,31 +76,31 @@ class ApiService {
   }
 
   // Vocabulary Management
-  async addWordToStudyList(username, word) {
-    return this.request(`/users/${username}/words/${word}`, {
+  async addWordToStudyList(word) {
+    return this.request(`/words/${word}`, {
       method: 'POST',
     });
   }
 
-  async getUserWords(username, status = null) {
+  async getUserWords(status = null) {
     const query = status ? `?status=${status}` : '';
-    return this.request(`/users/${username}/words${query}`);
+    return this.request(`/words${query}`);
   }
 
   // Review System
-  async getDueWords(username) {
-    return this.request(`/users/${username}/review`);
+  async getDueWords() {
+    return this.request('/review');
   }
 
-  async submitReview(username, word, quality) {
-    return this.request(`/users/${username}/review/${word}`, {
+  async submitReview(word, quality) {
+    return this.request(`/review/${word}`, {
       method: 'POST',
       body: JSON.stringify({ quality }),
     });
   }
 
-  async getReviewHistory(username, word) {
-    return this.request(`/users/${username}/review/${word}/history`);
+  async getReviewHistory(word) {
+    return this.request(`/review/${word}/history`);
   }
 }
 

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/words-api/words/internal/auth"
 	"github.com/words-api/words/internal/models"
 	"github.com/words-api/words/internal/services"
 )
@@ -21,11 +22,17 @@ func NewReviewHandler(db *sql.DB) *ReviewHandler {
 	}
 }
 
-// GetDueWords handles GET /api/users/:username/review
+// GetDueWords handles GET /api/review (authenticated endpoint)
 func (h *ReviewHandler) GetDueWords(c *gin.Context) {
-	username := c.Param("username")
+	user, exists := auth.GetAuthenticatedUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "not authenticated",
+		})
+		return
+	}
 
-	dueWords, err := h.service.GetDueWords(username)
+	dueWords, err := h.service.GetDueWords(user.Username)
 	if err != nil {
 		if err.Error() == "user not found" {
 			c.JSON(http.StatusNotFound, gin.H{
@@ -46,9 +53,16 @@ func (h *ReviewHandler) GetDueWords(c *gin.Context) {
 	})
 }
 
-// SubmitReview handles POST /api/users/:username/review/:word
+// SubmitReview handles POST /api/review/:word (authenticated endpoint)
 func (h *ReviewHandler) SubmitReview(c *gin.Context) {
-	username := c.Param("username")
+	user, exists := auth.GetAuthenticatedUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "not authenticated",
+		})
+		return
+	}
+
 	word := c.Param("word")
 
 	var request models.ReviewRequest
@@ -59,7 +73,7 @@ func (h *ReviewHandler) SubmitReview(c *gin.Context) {
 		return
 	}
 
-	updatedWord, err := h.service.SubmitReview(username, word, request.Quality)
+	updatedWord, err := h.service.SubmitReview(user.Username, word, request.Quality)
 	if err != nil {
 		statusCode := http.StatusInternalServerError
 		if err.Error() == "user not found" || err.Error() == "word not found" {
@@ -77,12 +91,19 @@ func (h *ReviewHandler) SubmitReview(c *gin.Context) {
 	c.JSON(http.StatusOK, updatedWord)
 }
 
-// GetReviewHistory handles GET /api/users/:username/review/:word/history
+// GetReviewHistory handles GET /api/review/:word/history (authenticated endpoint)
 func (h *ReviewHandler) GetReviewHistory(c *gin.Context) {
-	username := c.Param("username")
+	user, exists := auth.GetAuthenticatedUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "not authenticated",
+		})
+		return
+	}
+
 	word := c.Param("word")
 
-	history, err := h.service.GetReviewHistory(username, word)
+	history, err := h.service.GetReviewHistory(user.Username, word)
 	if err != nil {
 		if err.Error() == "user not found" || err.Error() == "word not found" {
 			c.JSON(http.StatusNotFound, gin.H{

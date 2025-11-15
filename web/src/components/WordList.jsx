@@ -13,7 +13,7 @@ function WordList({ user, onRefresh }) {
   const loadWords = async () => {
     setLoading(true);
     try {
-      const data = await api.getUserWords(user.username, filter);
+      const data = await api.getUserWords(filter);
       setWords(data.words || []);
     } catch (error) {
       console.error('Failed to load words:', error);
